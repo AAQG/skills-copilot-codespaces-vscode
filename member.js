@@ -1,10 +1,10 @@
 function skillMember() {
-    this.name = 'skillMember';
-    this.type = 'member';
-    this.path = 'skill';
-    this.cache = 0;
-    this.submenu = [{
-        name: 'skillMember',
-        path: 'skill'
-    }];
+    var member = {
+        name: "John",
+        age: 30,
+        sayName: function () {
+            alert(this.name);
+        }
+    };
+    return member;
 }
