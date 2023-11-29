@@ -1,34 +1,26 @@
-//Create Web Server
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
-//Connect to MongoDB
-const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/MyDatabase');
-//Create Schema
-const commentSchema = new mongoose.Schema({
-    id: String,
-    name: String,
-    comment: String
+// Create web server
+// Load the express module
+var express = require('express');
+// Invoke var express and store the resulting application in var app
+var app = express();
+// Load the path module
+var path = require('path');
+// Load the body-parser
+var bodyParser = require('body-parser');
+// Use bodyParser to parse form data sent via HTTP POST
+app.use(bodyParser.urlencoded({ extended: true }));
+// Set up static folder directory to be /static
+app.use(express.static(path.join(__dirname, './static')));
+// Set the location where express will look for the ejs views
+app.set('views', path.join(__dirname, './views'));
+// Set the view engine so express knows we are using ejs as templating engine
+app.set('view engine', 'ejs');
+// Require the mongoose config file which does the rest for us
+require('./server/config/mongoose.js');
+// Require routes.js file and pass it the express app
+var routeSetter = require('./server/config/routes.js');
+routeSetter(app);
+// Tell the express app to listen on port 8000
+app.listen(8000, function() {
+  console.log('Listening on port 8000');
 });
-//Create Model
-const Comment = mongoose.model('Comment', commentSchema);
-//Create Parser
-const urlencodedParser = bodyParser.urlencoded({ extended: false })
-//Create Router
-app.use(express.static('public'));
-app.get('/comment', (req, res) => {
-    Comment.find({}, (err, comments) => {
-        if (err) throw err;
-        res.render('index.ejs', { comments: comments });
-    });
-});
-app.post('/comment', urlencodedParser, (req, res) => {
-    let newComment = new Comment(req.body);
-    newComment.save((err) => {
-        if (err) throw err;
-        res.redirect('/comment');
-    });
-});
-app.listen(port, () => console.log(`Server is listening on port ${port}`));
